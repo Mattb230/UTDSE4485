@@ -25,6 +25,8 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.events.TouchListener;
+import org.eclipse.swt.events.TouchEvent;
 
 public class CSVConfig {
 
@@ -74,6 +76,9 @@ public class CSVConfig {
 	 * Create contents of the window.
 	 */
 	protected void createContents() {
+		
+		/////////////////////////////////Setup UI Components////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////
 		shlExportFileConfiguration = new Shell();
 		shlExportFileConfiguration.setSize(500, 500);
 		shlExportFileConfiguration.setText("Export File Configuration");
@@ -81,7 +86,6 @@ public class CSVConfig {
 		shlExportFileConfiguration.setLocation(100, 100);
 		
 		Composite composite = new Composite(shlExportFileConfiguration, SWT.NONE);
-		
 		Group grpSettings = new Group(composite, SWT.NONE);
 		grpSettings.setText("Settings");
 		grpSettings.setBounds(10, 10, 464, 176);
@@ -122,34 +126,15 @@ public class CSVConfig {
 		lblDelimiter.setBounds(46, 101, 55, 15);
 		lblDelimiter.setText("Delimiter");
 		
-		//Color red = new Color(SWT.COLOR_RED);
-		
 		final Button colHdrCheckButton = new Button(grpSettings, SWT.CHECK);
 		colHdrCheckButton.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		colHdrCheckButton.setText("Include Column Headers");
 		colHdrCheckButton.setSelection(true);
-		colHdrCheckButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				
-			}
-		});
-		//colHdrCheckButton.setText("Include Column Headers");
 		colHdrCheckButton.setToolTipText("Include column headers in export file");
 		colHdrCheckButton.setBounds(107, 139, 152, 16);
 		
-		Button saveButton = new Button(grpSettings, SWT.NONE);
+		final Button saveButton = new Button(grpSettings, SWT.NONE);
 		saveButton.setToolTipText("Save Configuration Settings");
-		saveButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-				Shell shlSaveDialog = new Shell();
-				//shlSaveDialog.setLocation(shlExportFileConfiguration.getLocation());
-				SaveDialog saveDialog = new SaveDialog(shlSaveDialog, SWT.APPLICATION_MODAL, shlExportFileConfiguration.getLocation());
-				//SaveDialog saveDialog = new SaveDialog(shlSaveDialog);
-				saveDialog.open();
-			}
-		});
 		saveButton.setBounds(386, 141, 68, 25);
 		saveButton.setText("Save");
 		
@@ -160,21 +145,6 @@ public class CSVConfig {
 		lblSettings.setBounds(217, 11, 122, 15);
 		lblSettings.setText("Saved Configurations ");
 		
-		Button btnRestoreDefaults = new Button(grpSettings, SWT.NONE);
-		btnRestoreDefaults.setToolTipText("Restore Default Settings");
-		btnRestoreDefaults.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				//restore default characters
-				debitText.setText("-");
-				creditText.setText("+");
-				delimiterText.setText(",");
-				colHdrCheckButton.setSelection(true);
-			}
-		});
-		btnRestoreDefaults.setBounds(283, 141, 97, 25);
-		btnRestoreDefaults.setText("Restore Defaults");
-		
 		Group grpSelectFields = new Group(composite, SWT.NONE);
 		grpSelectFields.setText("Fields to Export");
 		grpSelectFields.setBounds(10, 222, 464, 197);
@@ -183,86 +153,56 @@ public class CSVConfig {
 		dbMasterList.setBounds(23, 51, 125, 136);
 		
 		// TODO implement code to pull column names from linked list and place them into dbMasterList
-		// the next 3 lines are for demo purposes only REPLACE WITH FINAL IMPLEMENTATION
+		// the lines within the DEMO brackets are for demo purposes only. REPLACE WITH FINAL IMPLEMENTATION
+		////////////////////////////////DEMO/////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////
+		final LinkedList<String> inputList = new LinkedList<String>(new ArrayList<String>());
 		for(int i=0;i<30;i++){
-			dbMasterList.add("Column" + i);
+			inputList.add("Column" + i);
 		}
+		ListIterator<String> iterator = inputList.listIterator();
+		while(iterator.hasNext()){
+			dbMasterList.add(iterator.next().toString());
+		}
+		////////////////////////////////////////////////////////////////////////////////////////
 		
 		final List dbExportList = new List(grpSelectFields, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		dbExportList.setBounds(237, 51, 125, 136);
 		
-		Button addAllButton = new Button(grpSelectFields, SWT.NONE);
+		final Button addAllButton = new Button(grpSelectFields, SWT.NONE);
 		addAllButton.setToolTipText("Add All");
-		addAllButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-				dbExportList.removeAll();
-				dbExportList.setItems(dbMasterList.getItems());
-			}
-		});
 		addAllButton.setBounds(179, 57, 28, 25);
 		addAllButton.setText(">>");
 		
-		Button addSelButton = new Button(grpSelectFields, SWT.NONE);
+		final Button addSelButton = new Button(grpSelectFields, SWT.NONE);
 		addSelButton.setToolTipText("Add Selection");
-		addSelButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-				if(dbMasterList.getSelection().length != 0){
-					for(int i=0;i<dbMasterList.getSelection().length;i++){
-						dbExportList.add(dbMasterList.getSelection()[i]);
-					}
-				}
-			}
-		});
 		addSelButton.setBounds(179, 90, 28, 25);
 		addSelButton.setText(">");
+		addSelButton.setEnabled(false);
 		
-		Button removeSelButton = new Button(grpSelectFields, SWT.NONE);
+		final Button removeSelButton = new Button(grpSelectFields, SWT.NONE);
 		removeSelButton.setToolTipText("Remove Selection");
-		removeSelButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-				if(dbExportList.getSelection().length != 0){
-					String[] array = dbExportList.getSelection();
-					for(int i=0;i<array.length;i++){
-						dbExportList.remove(array[i]);
-					}
-				}
-				
-			}
-		});
 		removeSelButton.setBounds(179, 122, 28, 25);
 		removeSelButton.setText("<");
+		removeSelButton.setEnabled(false);
 		
-		Button removeAllButton = new Button(grpSelectFields, SWT.NONE);
+		final Button removeAllButton = new Button(grpSelectFields, SWT.NONE);
 		removeAllButton.setToolTipText("Remove All");
-		removeAllButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-				dbExportList.removeAll();
-			}
-		});
 		removeAllButton.setBounds(179, 155, 28, 25);
 		removeAllButton.setText("<<");
+		removeAllButton.setEnabled(false);
 		
-		Button moveUpButton = new Button(grpSelectFields, SWT.NONE);
+		final Button moveUpButton = new Button(grpSelectFields, SWT.NONE);
 		moveUpButton.setToolTipText("Move Selection Up");
-		moveUpButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-			}
-		});
+		moveUpButton.setEnabled(false);
+				
 		moveUpButton.setBounds(385, 90, 28, 25);
 		moveUpButton.setText("\u02C4");
 		
-		Button moveDownButton = new Button(grpSelectFields, SWT.NONE);
+		final Button moveDownButton = new Button(grpSelectFields, SWT.NONE);
 		moveDownButton.setToolTipText("Move Selection Down");
-		moveDownButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-			}
-		});
+		moveDownButton.setEnabled(false);
+		
 		moveDownButton.setBounds(385, 122, 28, 25);
 		moveDownButton.setText("\u02C5");
 		
@@ -278,23 +218,189 @@ public class CSVConfig {
 		lblChangeOrder.setBounds(385, 67, 36, 15);
 		lblChangeOrder.setText("Order");
 		
-		Button btnCancel = new Button(composite, SWT.NONE);
-		btnCancel.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				shlExportFileConfiguration.close();
-			}
-		});
-		btnCancel.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-			}
-		});
+		final Button btnCancel = new Button(composite, SWT.NONE);
 		btnCancel.setBounds(399, 429, 75, 25);
 		btnCancel.setText("Cancel");
 		
-		Button btnExport = new Button(composite, SWT.NONE);
+		final Button btnExport = new Button(composite, SWT.NONE);
 		btnExport.setToolTipText("Export CSV File");
+		btnExport.setBounds(318, 429, 75, 25);
+		btnExport.setText("Export");
+		
+		final Button btnRestoreDefaults = new Button(grpSettings, SWT.NONE);
+		btnRestoreDefaults.setToolTipText("Restore Default Settings");
+		btnRestoreDefaults.setBounds(283, 141, 97, 25);
+		btnRestoreDefaults.setText("Restore Defaults");
+		///////////////////////////////////////////////////////////////////////////////////////
+		
+		////////////////////////////////Listeners / Event Handlers/////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////
+		addAllButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbExportList.removeAll();
+				dbMasterList.removeAll();
+				ListIterator<String> iterator = inputList.listIterator();
+				while(iterator.hasNext()){
+					dbExportList.add(iterator.next().toString());
+				}
+				removeAllButton.setEnabled(true);
+				addAllButton.setEnabled(false);
+				addSelButton.setEnabled(false);
+			}
+		});
+		
+		addSelButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				String[] array = dbMasterList.getSelection();
+				if(array.length != 0){
+					for(int i=0;i<array.length;i++){
+						dbExportList.add(array[i]);
+						dbMasterList.remove(array[i]);
+					}
+				}
+				if(dbExportList.getItemCount() > 0){
+					removeAllButton.setEnabled(true);
+				}
+				addSelButton.setEnabled(false);
+			}
+		});
+		
+		removeSelButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				String[] array = dbExportList.getSelection();
+				if(array.length != 0){
+					for(int i=0;i<array.length;i++){
+						dbExportList.remove(array[i]);
+						int linkIndex = inputList.indexOf(array[i]);
+						if(dbMasterList.getItemCount() == 0){
+							dbMasterList.add(array[i]);
+						}
+						else if(linkIndex+1 > inputList.indexOf(dbMasterList.getItem(dbMasterList.getItemCount()-1))){
+							dbMasterList.add(array[i]);
+						}
+						else{
+							
+							for(int k=0;k<dbMasterList.getItemCount();k++){
+								int masterIndex = inputList.indexOf(dbMasterList.getItem(k));
+								if(linkIndex < masterIndex){
+									dbMasterList.add(array[i], k);
+									break;
+								}
+							}
+						}
+					}
+				}
+				addAllButton.setEnabled(true);
+				removeSelButton.setEnabled(false);
+				moveUpButton.setEnabled(false);
+				moveDownButton.setEnabled(false);
+			}
+		});
+		
+		removeAllButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbExportList.removeAll();
+				dbMasterList.removeAll();
+				ListIterator<String> iterator = inputList.listIterator();
+				while(iterator.hasNext()){
+					dbMasterList.add(iterator.next().toString());
+				}
+				removeAllButton.setEnabled(false);
+				addAllButton.setEnabled(true);
+				moveUpButton.setEnabled(false);
+				moveDownButton.setEnabled(false);
+			}
+		});
+		
+		moveUpButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				if(dbExportList.getSelectionIndex() > 0){
+					int index = dbExportList.getSelectionIndex();
+					String item = dbExportList.getSelection()[0];
+					dbExportList.remove(item);
+					dbExportList.add(item, index-1);
+					dbExportList.select(index-1);
+					moveDownButton.setEnabled(true);
+				}
+				if(dbExportList.getSelectionIndex() == 0){
+					moveUpButton.setEnabled(false);
+				}
+			}
+		});
+		
+		moveDownButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				if(dbExportList.getSelectionIndex() < dbExportList.getItemCount()-2){
+					int index = dbExportList.getSelectionIndex();
+					String item = dbExportList.getSelection()[0];
+					dbExportList.remove(item);
+					dbExportList.add(item, index+1);
+					dbExportList.select(index+1);
+					moveUpButton.setEnabled(true);
+				}
+				else if(dbExportList.getSelectionIndex() == dbExportList.getItemCount()-2){
+					String item = dbExportList.getSelection()[0];
+					dbExportList.remove(item);
+					dbExportList.add(item);
+					dbExportList.select(dbExportList.getItemCount()-1);
+				}
+				if(dbExportList.getSelectionIndex() == dbExportList.getItemCount()-1){
+					moveDownButton.setEnabled(false);	
+				}
+			}
+		});
+		
+		dbMasterList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				if(dbMasterList.getSelectionCount() > 0){
+					addSelButton.setEnabled(true);
+				}
+			}
+		});
+				
+		dbExportList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				switch (dbExportList.getSelection().length) {
+				case 1:
+					if(dbExportList.getSelectionIndex() > 0){
+						moveUpButton.setEnabled(true);
+					}
+					else{
+						moveUpButton.setEnabled(false);
+					}
+					if(dbExportList.getSelectionIndex() < dbExportList.getItemCount()-1){
+						moveDownButton.setEnabled(true);
+					}
+					else{
+						moveDownButton.setEnabled(false);
+					}
+					
+					removeSelButton.setEnabled(true);
+					break;
+				default:
+					removeSelButton.setEnabled(true);
+					moveUpButton.setEnabled(false);
+					moveDownButton.setEnabled(false);
+				}
+				
+			}
+		});
+		
+		btnCancel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				shlExportFileConfiguration.close();
+			}
+		});
+		
 		btnExport.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
@@ -316,63 +422,209 @@ public class CSVConfig {
 			    // Open Dialog and save result of selection
 			    String selected = fileDialog.open();
 			    System.out.println(selected);
+			    dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+				
 			}
 		});
-		btnExport.setBounds(318, 429, 75, 25);
-		btnExport.setText("Export");
-
+		
+		btnRestoreDefaults.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//restore default characters
+				debitText.setText("-");
+				creditText.setText("+");
+				delimiterText.setText(",");
+				colHdrCheckButton.setSelection(true);
+				dbExportList.removeAll();
+				dbMasterList.removeAll();
+				ListIterator<String> iterator = inputList.listIterator();
+				while(iterator.hasNext()){
+					dbMasterList.add(iterator.next().toString());
+				}
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+				removeAllButton.setEnabled(false);
+				addAllButton.setEnabled(true);
+			}
+		});
+		
+		saveButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				Shell shlSaveDialog = new Shell();
+				SaveDialog saveDialog = new SaveDialog(shlSaveDialog, SWT.APPLICATION_MODAL, shlExportFileConfiguration.getLocation());
+				saveDialog.open();
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		shlExportFileConfiguration.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		composite.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		grpSettings.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		grpSelectFields.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		colHdrCheckButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		delimiterText.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		lblDelimiter.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		creditText.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		lblCreditOperator.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		debitText.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		lblDebitOperator.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		configFilesCombo.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		lblSettings.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		lblMasterList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		lblExportList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		lblChangeOrder.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				dbMasterList.deselectAll();
+				dbExportList.deselectAll();
+				addSelButton.setEnabled(false);
+				removeSelButton.setEnabled(false);
+			}
+		});
+		
+		
 	}
-	
-	private void exportFile(Shell shell) {
-	    // File Save dialog
-	    FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
-	    // Set the text
-	    fileDialog.setText("Export File");
-	    // Set filter on .txt files
-	    fileDialog.setFilterExtensions(new String[] { "*.csv" });
-	    // Put in a readable name for the filter
-	    fileDialog.setFilterNames(new String[] { "Textfiles(*.txt)" });
-	    // Open Dialog and save result of selection
-	    String selected = fileDialog.open();
-	    System.out.println(selected);
-	    
-	   
-	    // Directly standard selection
-	    DirectoryDialog dirDialog = new DirectoryDialog(shell);
-	    dirDialog.setText("Select your home directory");
-	    String selectedDir = dirDialog.open();
-	    System.out.println(selectedDir);
-
-	    // Select Font
-	    FontDialog fontDialog = new FontDialog(shell);
-	    fontDialog.setText("Select your favorite font");
-	    FontData selectedFont = fontDialog.open();
-	    System.out.println(selectedFont);
-
-	    // Select Color
-	    ColorDialog colorDialog = new ColorDialog(shell);
-	    colorDialog.setText("Select your favorite color");
-	    RGB selectedColor = colorDialog.open();
-	    System.out.println(selectedColor);
-
-	    // Message
-	    MessageBox messageDialog = new MessageBox(shell, SWT.ERROR);
-	    messageDialog.setText("Evil Error has happend");
-	    messageDialog.setMessage("This is fatal!!!");
-	    int returnCode = messageDialog.open();
-	    System.out.println(returnCode);
-
-	    // Message with ok and cancel button and info icon
-	    messageDialog = new MessageBox(shell, 
-	        SWT.ICON_QUESTION | 
-	        SWT.OK
-	        | SWT.CANCEL);
-	    messageDialog.setText("My info");
-	    messageDialog.setMessage("Do you really want to do this.");
-	    returnCode = messageDialog.open();
-	    System.out.println(returnCode);
-	  }
-
-	
 
 }
