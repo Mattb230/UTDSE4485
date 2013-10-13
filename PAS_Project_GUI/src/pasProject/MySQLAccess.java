@@ -42,14 +42,19 @@ public class MySQLAccess {
 	}
 	
 
-	private void writeMetaData(ResultSet resultSet) throws SQLException {
+	private void writeMetaData(ResultSet resultSet) throws SQLException
+	{
 	  //writes the resultSet metadata to the console
-	    
-	  System.out.println("The columns in the table are: ");
-	    
-	  System.out.println("Table: " + resultSet.getMetaData().getTableName(1));
-	  for  (int i = 1; i<= resultSet.getMetaData().getColumnCount(); i++){
-	    System.out.println("Column " +i  + " "+ resultSet.getMetaData().getColumnName(i));
+	  
+	  //Get the metadata
+	  
+	  ResultSetMetaData resSetMetaData = resultSet.getMetaData();
+	  int intNumColumns = resSetMetaData.getColumnCount();
+	  
+	  for  (int i = 1; i< intNumColumns + 1; i++)
+	  {
+	  	String strName = resSetMetaData.getColumnName(i);
+	  	System.out.println(strName);
 	  }
 	}
 
