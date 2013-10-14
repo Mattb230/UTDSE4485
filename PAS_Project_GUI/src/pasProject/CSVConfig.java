@@ -152,6 +152,9 @@ public class CSVConfig {
 		final List dbMasterList = new List(grpSelectFields, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		dbMasterList.setBounds(23, 51, 125, 136);
 		
+		//hold the final export list
+		final LinkedList<String> exportList = new LinkedList<String>(new ArrayList<String>());
+		
 		// TODO implement code to pull column names from linked list and place them into dbMasterList
 		// the lines within the DEMO brackets are for demo purposes only. REPLACE WITH FINAL IMPLEMENTATION
 		////////////////////////////////DEMO/////////////////////////////////////////////////
@@ -165,7 +168,7 @@ public class CSVConfig {
 			dbMasterList.add(iterator.next().toString());
 		}
 		////////////////////////////////////////////////////////////////////////////////////////
-		
+/////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		final List dbExportList = new List(grpSelectFields, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		dbExportList.setBounds(237, 51, 125, 136);
 		
@@ -240,9 +243,12 @@ public class CSVConfig {
 			public void mouseUp(MouseEvent e) {
 				dbExportList.removeAll();
 				dbMasterList.removeAll();
+				exportList.clear();
 				ListIterator<String> iterator = inputList.listIterator();
 				while(iterator.hasNext()){
 					dbExportList.add(iterator.next().toString());
+					iterator.previous();
+					exportList.add(iterator.next().toString());
 				}
 				removeAllButton.setEnabled(true);
 				addAllButton.setEnabled(false);
@@ -258,6 +264,7 @@ public class CSVConfig {
 					for(int i=0;i<array.length;i++){
 						dbExportList.add(array[i]);
 						dbMasterList.remove(array[i]);
+						exportList.add(array[i]);
 					}
 				}
 				if(dbExportList.getItemCount() > 0){
@@ -274,6 +281,7 @@ public class CSVConfig {
 				if(array.length != 0){
 					for(int i=0;i<array.length;i++){
 						dbExportList.remove(array[i]);
+						exportList.remove(array[i]);
 						int linkIndex = inputList.indexOf(array[i]);
 						if(dbMasterList.getItemCount() == 0){
 							dbMasterList.add(array[i]);
@@ -305,6 +313,7 @@ public class CSVConfig {
 			public void mouseUp(MouseEvent e) {
 				dbExportList.removeAll();
 				dbMasterList.removeAll();
+				exportList.clear();
 				ListIterator<String> iterator = inputList.listIterator();
 				while(iterator.hasNext()){
 					dbMasterList.add(iterator.next().toString());
@@ -325,6 +334,8 @@ public class CSVConfig {
 					dbExportList.remove(item);
 					dbExportList.add(item, index-1);
 					dbExportList.select(index-1);
+					exportList.remove(item);
+					exportList.add(index - 1, item);
 					moveDownButton.setEnabled(true);
 				}
 				if(dbExportList.getSelectionIndex() == 0){
@@ -341,6 +352,8 @@ public class CSVConfig {
 					String item = dbExportList.getSelection()[0];
 					dbExportList.remove(item);
 					dbExportList.add(item, index+1);
+					exportList.remove(item);
+					exportList.add(index + 1, item);
 					dbExportList.select(index+1);
 					moveUpButton.setEnabled(true);
 				}
@@ -348,6 +361,8 @@ public class CSVConfig {
 					String item = dbExportList.getSelection()[0];
 					dbExportList.remove(item);
 					dbExportList.add(item);
+					exportList.remove(item);
+					exportList.add(item);
 					dbExportList.select(dbExportList.getItemCount()-1);
 				}
 				if(dbExportList.getSelectionIndex() == dbExportList.getItemCount()-1){
@@ -397,7 +412,9 @@ public class CSVConfig {
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				shlExportFileConfiguration.close();
+				System.out.print("exportList: ");
+				System.out.println(exportList.toString());
+				//shlExportFileConfiguration.close();
 			}
 		});
 		
@@ -440,6 +457,7 @@ public class CSVConfig {
 				colHdrCheckButton.setSelection(true);
 				dbExportList.removeAll();
 				dbMasterList.removeAll();
+				exportList.clear();
 				ListIterator<String> iterator = inputList.listIterator();
 				while(iterator.hasNext()){
 					dbMasterList.add(iterator.next().toString());
