@@ -412,9 +412,9 @@ public class CSVConfig {
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				System.out.print("exportList: ");
-				System.out.println(exportList.toString());
-				//shlExportFileConfiguration.close();
+				//System.out.print("exportList: ");
+				//System.out.println(exportList.toString());
+				shlExportFileConfiguration.close();
 			}
 		});
 		
