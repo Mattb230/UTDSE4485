@@ -51,7 +51,6 @@ public class SaveDialog extends Dialog {
 	 * Create contents of the dialog.
 	 */
 	private void createContents() {
-		//shlSaveFile = new Shell(getParent(), getStyle());
 		shlSaveFile = new Shell(getParent());
 		shlSaveFile.setSize(242, 300);
 		shlSaveFile.setText("Save File");
