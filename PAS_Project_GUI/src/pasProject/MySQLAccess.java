@@ -1,86 +1,69 @@
+/**
+ * @(#)MySQLAccess.java
+ *
+ *
+ * @David Rivera
+ * @version 1.00 2013/9/16
+ */
 package pasProject;
+import java.sql.*;
+import javax.sql.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Date;
+public class MySQLAccess
+{
+	private Connection con=null;
+	private String database;
+	private String server;
+	private String port;
+	private String userid;
+	private String password;
 
-public class MySQLAccess {
-	private Connection connect = null;
-	private Statement statement = null;
-	private PreparedStatement preparedStatement = null;
-	private ResultSet resultSet = null;
-	private Date date;
-
-	public void readDataBase(String query) throws Exception {
-		try {
-	     
-		 // This will load the MySQL driver, each DB has its own driver
-	     //Class.forName("com.mysql.jdbc.Driver");
-	     // Setup the connection with the DB -- David to provide DB connection details
-	     // example: connect = DriverManager.getConnection("jdbc:mysql://localhost/feedback?"
-	     //         + "user=sqluser&password=sqluserpw");
-	     //connect = DriverManager.getConnection("David to fill in details");
-
-	     //TODO set up statements to issue SQL queries to the database
-	     
-	     //
-	      
-	   } catch (Exception e) {
-	     throw e;
-	   } finally {
-	     close();
-	   }
-
-	 }
-	
-	public ResultSet getResultSet(){
-		return resultSet;
+	public MySQLAccess(String db) //Default Constructor db ={ med || pas }
+	{
+			//default connection settings for Med/Appli
+			server = "168.61.37.221";
+			port = "3306";
+			database = db;
+			userid = "medasset";
+			password = "password";
 	}
-	
-
-	private void writeMetaData(ResultSet resultSet) throws SQLException {
-	  //writes the resultSet metadata to the console
-	    
-	  System.out.println("The columns in the table are: ");
-	    
-	  System.out.println("Table: " + resultSet.getMetaData().getTableName(1));
-	  for  (int i = 1; i<= resultSet.getMetaData().getColumnCount(); i++){
-	    System.out.println("Column " +i  + " "+ resultSet.getMetaData().getColumnName(i));
-	  }
+	public MySQLAccess(String db, String host, String portNum, String user, String pass) //Constructor for diffrent server
+	{
+		database = db;
+		server = host;
+		port= portNum;
+		userid = user;
+		password=pass;
 	}
+	public void openConnection() //Opens Connection
+    {
+    	try
+		{
 
-	private void writeResultSet(ResultSet resultSet) throws SQLException {
-	  // ResultSet is initially before the first data set
-	  while (resultSet.next()) {
-	    // It is possible to get the columns via name
-	    // also possible to get the columns via the column number
-	    // which starts at 1
-	    // e.g. resultSet.getSTring(2);
-	    //TODO if this method is needed, fill in the desired statements below
-	  }
-	}
-
-	// Close the resultSet
-	private void close() {
-	  try {
-	    if (resultSet != null) {
-	      resultSet.close();
-	    }
-
-	    if (statement != null) {
-	      statement.close();
-	    }
-
-	    if (connect != null) {
-	      connect.close();
-	    }
-	  } catch (Exception e) {
-
-	  }
-	}
-
+			String url = "jdbc:mysql://"+server+":"+port+"/"+database;
+			Class.forName("com.mysql.jdbc.Driver");
+			con = DriverManager.getConnection(url, userid, password);
+			System.out.println("Connection Opened");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+    }
+    public void closeConnection() //Closes the Database Connection
+    {
+    	try
+    	{
+    		con.close();
+    		System.out.println("Connection Closed");
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
+    }
+    public Connection getConnection() //Returns the Connection
+    {
+    	return con;
+    }
 }
